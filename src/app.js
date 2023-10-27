@@ -24,11 +24,19 @@ const server = http.createServer((req, res) => {
     res.end();
     return;
   }
-  if (url.searchParams.get("hello")) {
-    res.status = 200;
+  if (url.searchParams.has("hello")) {
+    //  if (url.searchParams.get("hello")) {
+    //    res.status = 200;
+    //    res.statusMessage = "OK";
+    //    res.header = "Content-Type: text/plain";
+    //    res.write(`Hello, ${nameParam}.`);
+    //    res.end();
+    //    return;
+    //  }
+    res.status = 400;
     res.statusMessage = "OK";
     res.header = "Content-Type: text/plain";
-    res.write(`Hello, ${nameParam}.`);
+    res.write(`Enter a name`);
     res.end();
     return;
   }
