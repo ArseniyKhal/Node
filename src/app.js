@@ -1,40 +1,39 @@
 const http = require("http");
 const getUsers = require("./modules/users");
+const hostname = "127.0.0.1";
+const port = 3003;
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const nameParam = url.searchParams.get("hello");
   if (url.searchParams.has("users")) {
-    res.status = 200;
-    res.statusMessage = "OK";
-    res.header = "Content-Type: application/json";
-    res.write(getUsers());
-    res.end();
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.end(getUsers());
     return;
-  }
-  if (url.searchParams.has("hello")) {
+  } else if (url.searchParams.has("hello")) {
     if (url.searchParams.get("hello")) {
-      res.status = 200;
-      res.statusMessage = "OK";
-      res.header = "Content-Type: text/plain";
-      res.write(`Hello, ${nameParam}.`);
-      res.end();
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "text/plain");
+      res.end(`Hello, ${nameParam}.`);
       return;
     }
-    res.status = 400;
-    res.statusMessage = "OK";
-    res.header = "Content-Type: text/plain";
-    res.write(`Enter a name`);
-    res.end();
+    res.statusCode = 400;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Enter a name");
     return;
+  } else if (url.searchParams.toString()) {
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("");
+    return;
+  } else {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Hello, World!");
   }
-  res.status = 200;
-  res.statusMessage = "OK";
-  res.header = "Content-Type: text/plain";
-  res.write("Hello, World!");
-  res.end();
 });
 
-server.listen(3003, () => {
-  console.log("Сервер запущен по адресу http://127.0.0.1:3003");
+server.listen(port, hostname, () => {
+  console.log(`Сервер запущен по адресу http://${hostname}:${port}/`);
 });
