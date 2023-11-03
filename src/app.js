@@ -1,39 +1,46 @@
-const http = require("http");
-const getUsers = require("./modules/users");
-const hostname = "127.0.0.1";
-const port = 3003;
+const express = require("express");
+const app = express();
+const dotenv = require("dotenv");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const userRouter = require("./routes/users");
+const bodyParser = require("body-parser");
+const loggerOne = require("./middlewares/loggerOne");
 
-const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const nameParam = url.searchParams.get("hello");
-  if (url.searchParams.has("users")) {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.end(getUsers());
-    return;
-  } else if (url.searchParams.has("hello")) {
-    if (url.searchParams.get("hello")) {
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "text/plain");
-      res.end(`Hello, ${nameParam}.`);
-      return;
-    }
-    res.statusCode = 400;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("Enter a name");
-    return;
-  } else if (url.searchParams.toString()) {
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("");
-    return;
-  } else {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("Hello, World!");
-  }
+dotenv.config();
+app.use(userRouter);
+
+const {
+  PORT = 3000,
+  API_URL = "http://127.0.0.1",
+  MONGO_URL = "mongodb://127.0.0.1:27017/mydb",
+} = process.env;
+
+mongoose.connect(MONGO_URL);
+const database = mongoose.connection;
+database.on("error", (error) => {
+  console.log(error);
+});
+database.once("connected", () => {
+  console.log("Connected to MongoDB");
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Сервер запущен по адресу http://${hostname}:${port}/`);
+const helloWorld = (request, response) => {
+  response.status(200);
+  response.send("hello, World!");
+};
+
+app.get("/", helloWorld);
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(loggerOne);
+
+app.post("/", (request, response) => {
+  response.status(200);
+  response.send("Hello from POST");
+});
+
+app.listen(PORT, () => {
+  console.log(`Сервер запущен по адресу ${API_URL}:${PORT}`);
 });
