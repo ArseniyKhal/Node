@@ -24,7 +24,7 @@ const createUser = (request, response) => {
     });
 };
 
-// Обновляем пользователя.
+// Обновляем пользователя
 const updateUser = (request, response) => {};
 
 // Удаляем пользователя
